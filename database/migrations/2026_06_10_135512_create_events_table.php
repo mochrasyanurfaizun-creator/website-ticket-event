@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->string('artist')->nullable();
             $table->string('slug')->unique();
             $table->string('category');
             $table->string('venue');
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->integer('tickets_sold')->default(0);
             $table->text('description')->nullable();
             $table->string('accent_color')->default('#f4561e');
+            $table->string('image_url')->nullable();
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_trending')->default(false);
             $table->timestamps();
