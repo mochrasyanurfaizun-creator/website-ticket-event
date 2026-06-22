@@ -1,20 +1,22 @@
-FROM php:8.3-fpm
+FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
-    libpng-dev libjpeg-dev libfreetype6-dev zip unzip git nginx \
+    libpng-dev libjpeg-dev libfreetype6-dev zip unzip git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql
+    && docker-php-ext-install gd pdo pdo_mysql \
+    && a2enmod rewrite
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www
+WORKDIR /var/www/html
 COPY . .
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-COPY nginx.conf /etc/nginx/sites-available/default
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-EXPOSE 8080
+# Buat entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Pakai shell script biar nginx dan php-fpm jalan bersamaan
-CMD bash -c "php-fpm -D && nginx -g 'daemon off;'"
+ENTRYPOINT ["docker-entrypoint.sh"]
