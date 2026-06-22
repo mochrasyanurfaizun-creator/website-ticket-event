@@ -12,8 +12,9 @@ COPY . .
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-# Copy nginx config
 COPY nginx.conf /etc/nginx/sites-available/default
 
 EXPOSE 8080
-CMD service nginx start && php-fpm
+
+# Pakai shell script biar nginx dan php-fpm jalan bersamaan
+CMD bash -c "php-fpm -D && nginx -g 'daemon off;'"
